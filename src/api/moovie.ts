@@ -22,7 +22,7 @@ export const searchMovies = async (moviename:string) => {
     }
 
     const data = await response.json();
-    return data;
+    return data.results;
   } catch (error) {
     console.error("Error in searchMovies:", error);
     throw error;
