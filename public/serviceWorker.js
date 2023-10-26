@@ -14,6 +14,25 @@ self.addEventListener("install", (event) => {
   );
 });
 
+// récupération des données de réponse
+self.addEventListener("backgroundfetchsuccess", (event) => {
+  const registration = event.registration;
+  event.waitUntil(async() => {
+    const registration = event.registration;
+    const records = await registration.matchAll();
+    const responsePromises = records.map(
+      async(record) => await record.responseReady,
+    );
+    const responses = Promise.all(responsePromises);
+  });
+  event.updateUI({ title: "téléchargement terminé!" })
+});
+// Avec updateUI() , le gestionnaire peut mettre à jour le titre et l'icône de l'élément d'interface utilisateur
+
+self.addEventListener("backgroundfetchfail", (event)=>{
+  event.updateUI({ title: "téléchargement incomplet" });
+})
+
 // listen for request
 self.addEventListener("fetch", (event) => {
   event.respondWith(
@@ -23,7 +42,7 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// actitivate the service worker
+// activate the service worker
 self.addEventListener("activate", (event) => {
     const cacheWhitelist = [];
     cacheWhitelist.push(CACHE_NAME);

@@ -1,6 +1,6 @@
 {
-  "short_name": "Test PWA",
-  "name": "TEST PWA",
+  "short_name": "Tp-movie",
+  "name": "Tp movie",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,12 +10,20 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
+    }
+  ],
+  "prefer_related_applications":true,
+  "related_applications":[
+    {
+      "platform": "play",
+      "id": "com.google.samples.apps.iosched"
     }
   ],
   "start_url": ".",
