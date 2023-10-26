@@ -24,16 +24,16 @@ const App: React.FC = () => {
     }
   };
 
-  function truncateOverview(overview: string, wordLimit: number): string {
-    const words = overview.split(" ");
+  // function truncateOverview(overview: string, wordLimit: number): string {
+  //   const words = overview.split(" ");
 
-    if (words.length <= wordLimit) {
-      return overview;
-    }
+  //   if (words.length <= wordLimit) {
+  //     return overview;
+  //   }
 
-    const truncatedText = words.slice(0, wordLimit).join(" ");
-    return `${truncatedText} ...`;
-  }
+  //   const truncatedText = words.slice(0, wordLimit).join(" ");
+  //   return `${truncatedText} ...`;
+  // }
   return (
     <div>
       <h1>Looking for a movie?</h1>
@@ -63,36 +63,23 @@ const App: React.FC = () => {
           margin: "auto",
         }}
       >
-        {movies?.map((movie: any, index: number) => {
-          return (
-            <div
-              key={index}
-              style={{
-                width: "400px",
-                height: "330px",
-                border: "2px solid #000000",
-                borderRadius: "5px",
-                margin: "30px 10px",
-              }}
-            >
-              <div style={{ padding: "5px 10px" }}>
-                <p style={{ fontWeight: "bold", textTransform: "capitalize" }}>
-                  {" "}
-                  {movie.title} (Original title: {movie.original_title}):{" "}
-                  {movie.original_language}
-                </p>
-                <img
-                  style={{ width: "200px", height: "200px" }}
-                  src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                  alt="movie"
-                />
-                <div>
+        {movies?.map((movie, index) => (
+          <div key={index} className="movie-container">
+            <img
+              className="movie-image"
+              src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+              alt="movie"
+            />
+            <div className="movie-info">
+              <p className="movie-title">
+                {`${movie.title} (Original title: ${movie.original_title}): ${movie.original_language}`}
+              </p>
+              {/* <div>
                   <b>Overview: </b> {truncateOverview(movie.overview, 10)}
-                </div>
-              </div>
+                </div> */}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
