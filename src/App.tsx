@@ -6,6 +6,7 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [movies, setMovies] = useState<any[]>([]);
+  const [isOffline, setIsOffline] = useState<boolean>(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,10 +15,15 @@ const App: React.FC = () => {
       try {
         const moviedata = await searchMovies(searchTerm);
         console.log(moviedata);
+        setIsOffline(false);
         setMovies(moviedata);
         setSearchTerm('');
         setIsLoading(false);
       } catch (error) {
+        if (!navigator.onLine) {
+          setIsOffline(true);
+          setMovies([]);
+        }
         console.error("Error in handleSearch:", error);
         setIsLoading(false);
       }
@@ -53,6 +59,9 @@ const App: React.FC = () => {
         </form>
       </div>
       <hr />
+      {
+        isOffline && <h2 style={{ textAlign: "center" }}>Oups😥, tsisy connexion? Alefao donnée na wifi de mandeha🙃.</h2>
+      }
       <div
         style={{
           marginTop: "40px",
