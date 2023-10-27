@@ -51,7 +51,8 @@ const Auth: React.FC = () => {
     }
   };
 
-  const copyToClipBoard = () => {
+  const copyToClipBoard = (e: any) => {
+    e.preventDefault();
     copy("7733263982f2fbede06debb35a9009ff");
   };
   return (

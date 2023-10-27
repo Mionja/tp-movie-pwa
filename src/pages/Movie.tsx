@@ -40,9 +40,9 @@ const Movie: React.FC = () => {
   return (
     <div>
       <header>
-        <h1>TP-MIONJA</h1>
+        <h1 className="pt-2 h2">TP-MIONJA</h1>
         <div className="search-bar">
-          <form onSubmit={handleSearch}>
+          <form onSubmit={handleSearch} className="search-form">
             <input
               type="text"
               placeholder="Nom du film"
