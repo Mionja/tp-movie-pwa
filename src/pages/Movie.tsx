@@ -57,7 +57,6 @@ const Movie: React.FC = () => {
           </form>
         </div>
       </header>
-      <hr />
       {isOffline && (
         <h2 style={{ textAlign: "center" }}>Oups😥, you're offline.</h2>
       )}
