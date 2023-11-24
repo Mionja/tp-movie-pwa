@@ -5,7 +5,10 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Web site created using create-react-app" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -38,13 +41,121 @@
     -->
   </body>
   <script>
+    if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('./firebase-messaging-sw.js')
+  .then(function(registration) {
+    console.log('Registration successful, scope is:', registration.scope);
+  }).catch(function(err) {
+    console.log('Service worker registration failed, error:', err);
+  });
+}
+  </script>
+  <script>
+    const displayNotification = async (notificationTitle) => {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        console.log('Service Worker ready:', registration);
+        if (registration.active) {   
+          if (Notification.permission === 'granted') {
+            const options = {
+              body: 'Merci d\'avoir autorisé la push notification!',
+              icon: './logo512.png',
+              vibrate: [100, 50, 100],
+              data: {
+                dateOfArrival: Date.now(),
+                primaryKey: 0
+              }
+            };
+  
+            await registration.showNotification(notificationTitle, options);
+          }
+        } else {
+          console.log('activate your registration');
+        }
+      } catch (error) {
+        console.error('Error displaying notification:', error);
+      }
+    };
+
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
         navigator.serviceWorker
           .register("./serviceWorker.js")
-          .then(res => console.log("service worker registered"))
+          .then(res => {
+            console.log("service worker registered", res)
+            if("Notification" in window && Notification.permission !== "granted") {
+              console.log('Demander l\'autorisation de l\'utilisateur');
+              Notification.requestPermission( status => {
+                console.log('Status: ', status);
+                displayNotification('Notification activée')
+              } )
+            }
+          })
           .catch(err => console.log("service worker not registered", err));
       });
     }
+
+    const updateSubscriptionOnServer = subscription => {
+      console.log('Code ajax pour enregistrer un utilisateur à DB', subscription); console.log(JSON.stringify(subscription))
+      console.log(JSON.stringify(subscription));
+      // requette ajax avec fetch, jquery, axios pour l'enregistrement
+    }
+
+    const subscribeUser = async () => {
+      console.log('subscribe user');
+      if ("serviceWorker" in navigator) {
+      const swRegistration = await navigator.serviceworker.getRegistration();
+      const applicationServerPublicKey = 'BIa-ugQ0oKS0yrjKLE5j3gqqhTwDyNVgPWWrNBn1AO-C_Iiw4p1GId1s1Yvt8EZU5z1X9mbNHMDnFQhYOFPtTSo';
+      const applicationServerKey = ur1B64ToUint8Array (applicationServerPublicKey);
+      swRegistration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey
+      })
+      .then((subscription) => {
+        console.log('L User vient de s\'abonner:', subscription); updateSubscriptionOnServer (subscription);
+        updateSubscriptionOnServer(subscription);
+      })
+      .catch((err) => {
+        if (Notification.permission === 'denied') {
+        console.warn('autorisation pour les notifications a été refusée')
+        } else {
+          console.error('Échec de 1 abonnement de user: ', err)
+        }
+      });
+      }
+    }
+
+    const ur1B64ToUint8Array = (base64String) => {
+      const padding = '=' .repeat ((4 - base64String.length % 4) % 4)
+      const base64 = (base64String + padding)
+                    .replace(/\-/g, '+')
+                    .replace(/_/g, '7')
+      const rawData = window.atob (base64);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+      }
+      return outputArray;
+    };
+
+    const checkSubscription = async () => {
+      const swRegistration = await navigator.serviceWorker.getRegistration(); 
+      if(!swRegistration) {
+        console.log('Pas de service worker detecté')
+        return;
+      }
+      swRegistration.pushManager.getSubscription() 
+      .then(subscription => {
+        if (!!subscription) {
+          console.log('Utilisateur déjà abonné.');
+          updateSubscriptionOnServer(subscription);
+        } else {
+          console.log('Utilisateur non abonné. Inscrire à nouveau.');
+          subscribeUser();
+        }
+      });
+    }
+
+    checkSubscription();
   </script>
 </html>

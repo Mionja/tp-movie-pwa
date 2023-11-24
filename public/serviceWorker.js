@@ -1,4 +1,4 @@
-const CACHE_NAME = "version-1";
+const CACHE_NAME = "version-2";
 const urlsToCache = ["index.html", "offline.html"];
 const self = this;
 
@@ -48,21 +48,35 @@ self.addEventListener("activate", (event) => {
   const cacheWhitelist = [CACHE_NAME];
   console.log("activate");
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches
+      .keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (!cacheWhitelist.includes(cacheName)) {
+              return caches.delete(cacheName);
+            }
+            return Promise.resolve();
+          })
+        );
+      })
+      .then(() => {
+        console.log("Old caches removed");
+      })
   );
 });
 
 // Message event: Listen for messages to skip the waiting state and activate the new service worker
 self.addEventListener("message", (event) => {
   if (event.data === "skipWaiting") {
+    console.log('SkipWaiting');
     self.skipWaiting();
   }
+});
+
+// Send notification push to the user
+self.addEventListener("push", (event) => {
+  const json = JSON.parse(event.data.text());
+  console.log('Push data', event.data.text());
+  self.ServiceWorkerRegistration.showNotification(json.header, json.options);
 });
